@@ -1,0 +1,138 @@
+﻿@model InvoiceSystem.Models.CustomerInvoice
+
+@{
+    ViewData["Title"] = "Create Invoice";
+}
+
+<h1>Create Invoice</h1>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label for="customerName">Customer Name</label>
+        <input asp-for="CustomerName" class="form-control" required />
+        <span asp-validation-for="CustomerName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label for="customerEmail">Customer Email</label>
+        <input asp-for="CustomerEmail" class="form-control" type="email" />
+        <span asp-validation-for="CustomerEmail" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label for="customerAddress">Customer Address</label>
+        <textarea asp-for="CustomerAddress" class="form-control"></textarea>
+        <span asp-validation-for="CustomerAddress" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label for="invoiceDate">Invoice Date</label>
+        <input asp-for="InvoiceDate" class="form-control" type="date" value="@DateTime.Now.ToShortDateString()" />
+        <span asp-validation-for="InvoiceDate" class="text-danger"></span>
+    </div>
+
+    <h3>Invoice Items</h3>
+    <table id="itemsTable" class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Description</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Total</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr id="tr_1">
+                <td><input type="text" class="form-control" name="items[0].Description" /></td>
+                <td><input type="number" class="form-control price" step="0.01" name="items[0].Price" /></td>
+                <td><input type="number" class="form-control qty" name="items[0].Quantity" min="1" /></td>
+                <td><span class="total" id="itemTotal_0">0.00</span></td>
+                <td> <button type="button" id="add-item-btn" class="btn btn-primary">Add Item</button></td>
+            </tr>
+            
+        </tbody>
+    </table>
+    <table>
+        <thead>
+            <th>Grand total</th>
+        </thead>
+        <tbody>
+        <tr>
+            <td><span class="grandtotal">0.00</span></td>
+                <input asp-for="TotalPrice" class="form-control grandtotal" />
+        </tr>
+        </tbody>
+    </table>
+
+
+    <div class="form-group">
+        <input type="submit" value="Create Invoice" class="btn btn-success" />
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+
+
+            var id = 1;
+
+
+
+
+            // Add item button click event
+            $("#add-item-btn").click(function () {
+                id++;
+                var itemCount = $("#itemsTable tbody tr").length;
+                var newRow = `<tr id="tr_${id}">
+                                    <td><input type="text" class="form-control" name="items[${itemCount}].Description" /></td>
+                                    <td><input type="number" class="form-control price" step="0.01" name="items[${itemCount}].Price" /></td>
+                                    <td><input type="number" class="form-control qty" name="items[${itemCount}].Quantity" min="1" /></td>
+                                    <td><span class="total" id="itemTotal_${itemCount}">0.00</span></td>
+                                    <td><button type="button" class="btn btn-danger remove-item-btn" value="${id}" id="item_${id}" >-</button></td>
+                                </tr>`;
+                $("#itemsTable tbody").append(newRow);
+                updateTotal();
+
+                // Update total price for other items
+
+                function removes(id) {
+                    $("#tr_" + id).remove();
+                }
+                $("#item_" + id).click(function () {
+                    var id = $(this).val();
+                    removes(id);
+                    updateTotal();
+                });
+            });
+
+
+            $('#itemsTable').on('change', '.price, .qty', function () {
+                calculateItemTotal(this);
+                updateTotal();
+            });
+
+            // Update item total function
+            function calculateItemTotal(input) {
+                var price = $(input).closest('tr').find('.price').val();
+                var qty = $(input).closest('tr').find('.qty').val();
+                var totalPrice = parseFloat(price) * parseFloat(qty);
+
+                // Update total display
+                $(input).closest('tr').find('.total').text(totalPrice.toFixed(2));
+
+
+            }
+
+
+            // Update total function
+            function updateTotal() {
+                var grandTotal = 0;
+                $('.total').each(function () {
+                    grandTotal += parseFloat($(this).text());
+                });
+                $('.grandtotal').val(grandTotal.toFixed(2));
+            }
+
+
+        });
+    </script>
+}

@@ -1,0 +1,11 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\InvoiceSystem",
+    "\\InvoiceSystem\\Models",
+    "\\InvoiceSystem\\Views",
+    "\\InvoiceSystem\\Views\\Invoice"
+  ],
+  "SelectedNode": "\\InvoiceSystem\\Models\\DatabaseContext.cs",
+  "PreviewInSolutionExplorer": false
+}
